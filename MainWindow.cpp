@@ -35,6 +35,7 @@ void MainWindow::initRenameThread() {
     connect(this, &MainWindow::signalRenameStart, threadRename, &ThreadReName::onThreadReNameStart);
     connect(this, &MainWindow::signalGetFiles, threadRename, &ThreadReName::onThreadGetFiles);
     connect(threadRename, &ThreadReName::signalFileList, this, [=] (const QFileInfoList &list) {
+        ui->treeWidgetSrcDir->clear();
         mSrcFileInfoList = list;
         QStringList fileList;
         QList<QTreeWidgetItem*> treeList;
@@ -80,6 +81,7 @@ void MainWindow::onPushButton() {
             qDebug()<<" path is "<<mStringSrcPath<<mStringDstPath;
             ui->lineEditDstDir->setText(mStringDstPath.isNull() ? mStringSrcPath : mStringDstPath);
             QList<QTreeWidgetItem*> treeList;
+            mDstFileInfoList.clear();
 //            QRect rect(ui->treeWidgetSrcDir->visualItemRect(ui->treeWidgetSrcDir))
             for (int i = 0; i < mSrcFileInfoList.size(); ++i) {
 //                fileList.append(list.at(i).absoluteFilePath());

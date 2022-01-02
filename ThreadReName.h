@@ -17,6 +17,7 @@ public:
 private:
     QFileInfoList getFileList(const QString &path, const QStringList &filterList);
     bool execProcess(const QString &cmd, const QStringList &param);
+    bool execProcess(const QString &cmd, const QStringList &param, const QString &filePath, const QString &srcFile, const QString &dstFile);
 signals:
     void signalStatus(bool value);
     void signalFileList(const QFileInfoList &list);

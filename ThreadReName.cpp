@@ -7,6 +7,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QProcess>
+#include <QCollator>
 
 ThreadReName::ThreadReName(QObject *parent) : QObject(parent) {
 
@@ -28,7 +29,13 @@ void ThreadReName::onThreadReNameStart(const QFileInfoList &mSrcFileInfoList, co
 //        execProcess("bash", QStringList()<<"-c"<<"sudo -S mkdir /home/alex/test111");
 //        execProcess("bash", QStringList()<<"-c"<<"sudo -S ls");
 //        execProcess("ls", QStringList());
-        execProcess("ln", QStringList()<<"-s"<<mSrcFileInfoList.at(i).absoluteFilePath()<<mDstFileInfoList.at(i).absoluteFilePath());
+        if (mSrcFileInfoList.at(i).absolutePath() == mDstFileInfoList.at(i).absolutePath()){
+            qDebug()<<"onThreadReNameStart "<<mSrcFileInfoList.at(i).fileName()<<mDstFileInfoList.at(i).fileName()<<i<<mDstFileInfoList;
+            execProcess("ln", QStringList()<<"-s", mSrcFileInfoList.at(i).absolutePath(),
+                        mSrcFileInfoList.at(i).fileName(), mDstFileInfoList.at(i).fileName());
+        } else {
+            execProcess("ln", QStringList()<<"-s"<<mSrcFileInfoList.at(i).absoluteFilePath()<<mDstFileInfoList.at(i).absoluteFilePath());
+        }
     }
 }
 
@@ -40,8 +47,8 @@ QFileInfoList ThreadReName::getFileList(const QString &path, const QStringList &
     for(int i = 0; i != folderList.size(); i++) {
         QString name = folderList.at(i).absoluteFilePath();
         qDebug()<<"folder is "<<name<<i;
-        QFileInfoList child_file_list = getFileList(name, filterList);
-        fileList.append(child_file_list);
+        QFileInfoList childFileList = getFileList(name, filterList);
+        fileList.append(childFileList);
     }
 
     return fileList;
@@ -50,9 +57,20 @@ QFileInfoList ThreadReName::getFileList(const QString &path, const QStringList &
 void ThreadReName::onThreadGetFiles(const QString &fileDir) {
     qDebug()<<" onThreadGetFiles string path is "<<fileDir;
     auto dataList = getFileList(fileDir, QStringList());
+    QFileInfoList sortedDataList;
+    QStringList stringList;
+    for (int i = 0; i < dataList.size(); ++i) {
+        stringList.append(dataList.at(i).absoluteFilePath());
+    }
+    QCollator collator;
+    collator.setNumericMode(true);
+    std::sort(stringList.begin(), stringList.end(), collator);
     qDebug()<<" srcPath file is "<<dataList;
-    if (!dataList.isEmpty()) {
-        emit signalFileList(dataList);
+    for (int i = 0; i < stringList.size(); ++i) {
+        sortedDataList.append(QFileInfo(stringList.at(i)));
+    }
+    if (!sortedDataList.isEmpty()) {
+        emit signalFileList(sortedDataList);
     }
 }
 
@@ -78,5 +96,30 @@ bool ThreadReName::execProcess(const QString &cmd, const QStringList &param) {
     qDebug()<<" proc out put is "<<procOutput;
     return true;
 
+}
+
+bool ThreadReName::execProcess(const QString &cmd, const QStringList &param, const QString &filePath,
+                               const QString &srcFile, const QString &dstFile) {
+    QProcess process;
+    process.setWorkingDirectory(filePath);
+    qDebug()<<"exec process"<<filePath<<srcFile<<dstFile;
+    qDebug()<<"exec process string list"<<QStringList()<<param<<srcFile<<dstFile;
+    process.start(cmd, QStringList()<<param<<srcFile<<dstFile);
+    // 等待进程启动
+    if (!process.waitForStarted()) {
+        qDebug() <<  "process start failed\n";
+        return false;
+    }
+    process.closeWriteChannel();
+
+    // 用于保存进程的控制台输出
+    QByteArray procOutput;
+    while (!process.waitForFinished(300)) {
+        qDebug() <<  "process finished failed\n";
+        return false;
+    }
+    procOutput = process.readAll();
+    qDebug()<<" proc out put is "<<procOutput;
+    return true;
 }
 
