@@ -61,7 +61,7 @@ void MainWindow::onPushButton() {
         const QString &path = QFileDialog::getExistingDirectory(this, "打开原始文件夹", ".");
         if (!path.isNull()) {
             mStringSrcPath = path;
-            emit signalGetFiles(mStringSrcPath);
+            emit signalGetFiles(mStringSrcPath, (nullptr == ui->lineEditSuffix->text()) ? QStringList() : QStringList()<<ui->lineEditSuffix->text());
         }
         ui->lineEditSrcDir->setText(mStringSrcPath);
     } else if (ui->pushButtonOpenDstDir == sends) {
@@ -86,10 +86,10 @@ void MainWindow::onPushButton() {
             for (int i = 0; i < mSrcFileInfoList.size(); ++i) {
 //                fileList.append(list.at(i).absoluteFilePath());
                 qDebug() << " tree item is " << mSrcFileInfoList.at(i).suffix() << mSrcFileInfoList.at(i).absoluteDir().path();
-                QString stringFile = QString("%1/S%2E%3.%4").
+                QString stringFile = QString("%1/s%2e%3.%4").
                         arg(mStringDstPath.isNull() ? mSrcFileInfoList.at(i).absolutePath() : mStringDstPath).
                         arg(ui->lineEditSeason->text().toInt(), 2, 10, QLatin1Char('0')).
-                        arg(i + 1, 2, 10, QLatin1Char('0')).
+                        arg(i + ui->lineEditStartIndex->text().toInt(), 2, 10, QLatin1Char('0')).
                         arg(mSrcFileInfoList.at(i).suffix());
                 auto data = new QTreeWidgetItem(QStringList() << stringFile);
                 mDstFileInfoList.append(QFileInfo(stringFile));

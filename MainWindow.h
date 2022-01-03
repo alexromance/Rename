@@ -40,7 +40,7 @@ private:
     void removeItem(QTreeWidgetItem *item, int index);
 
 signals:
-    void signalGetFiles(const QString &fileDir);
+    void signalGetFiles(const QString &fileDir, const QStringList &filter);
     void signalRenameStart(const QFileInfoList &mSrcFileInfoList, const QFileInfoList &mDstFileInfoList);
 
 private slots:

@@ -38,12 +38,12 @@
           <item>
            <widget class="QLabel" name="label_2">
             <property name="text">
-             <string>季数</string>
+             <string>后缀</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="lineEditSeason_2">
+           <widget class="QLineEdit" name="lineEditSuffix">
             <property name="dragEnabled">
              <bool>false</bool>
             </property>
@@ -105,6 +105,20 @@
           </item>
           <item>
            <widget class="QLineEdit" name="lineEditSeason">
+            <property name="text">
+             <string>1</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>起始序号</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="lineEditStartIndex">
             <property name="text">
              <string>1</string>
             </property>

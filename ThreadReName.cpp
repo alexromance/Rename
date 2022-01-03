@@ -41,7 +41,12 @@ void ThreadReName::onThreadReNameStart(const QFileInfoList &mSrcFileInfoList, co
 
 QFileInfoList ThreadReName::getFileList(const QString &path, const QStringList &filterList) {
     QDir dir(path);
-    QFileInfoList fileList = dir.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+    QFileInfoList fileList;
+    if (filterList.isEmpty()) {
+        fileList = dir.entryInfoList(QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+    } else {
+        fileList = dir.entryInfoList(filterList, QDir::Files | QDir::Hidden | QDir::NoSymLinks);
+    }
     QFileInfoList folderList = dir.entryInfoList(QDir::Dirs | QDir::NoDotAndDotDot);
 
     for(int i = 0; i != folderList.size(); i++) {
@@ -54,9 +59,9 @@ QFileInfoList ThreadReName::getFileList(const QString &path, const QStringList &
     return fileList;
 }
 
-void ThreadReName::onThreadGetFiles(const QString &fileDir) {
-    qDebug()<<" onThreadGetFiles string path is "<<fileDir;
-    auto dataList = getFileList(fileDir, QStringList());
+void ThreadReName::onThreadGetFiles(const QString &fileDir, const QStringList &filter) {
+    qDebug()<<" onThreadGetFiles string path is "<<fileDir<<filter;
+    auto dataList = getFileList(fileDir, filter);
     QFileInfoList sortedDataList;
     QStringList stringList;
     for (int i = 0; i < dataList.size(); ++i) {

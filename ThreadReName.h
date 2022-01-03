@@ -25,7 +25,7 @@ signals:
 public slots:
     void onThreadReNameInit();
     void onThreadReNameStart(const QFileInfoList &mSrcFileInfoList, const QFileInfoList &mDstFileInfoList);
-    void onThreadGetFiles(const QString &fileDir);
+    void onThreadGetFiles(const QString &fileDir, const QStringList &filter);
 };
 
 
